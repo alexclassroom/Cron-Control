@@ -40,26 +40,45 @@ const LOCK_DEFAULT_LIMIT              = 10;
 const LOCK_DEFAULT_TIMEOUT_IN_MINUTES = 10;
 
 /**
+ * Bucket Size/Count
+ */
+const BUCKET_SIZE_DEFAULT         = \MB_IN_BYTES * 0.95;
+const BUCKETS_DEFAULT             = 5;
+
+const BUCKET_SIZE_LIMIT           = ( \MB_IN_BYTES * 5 ) * 0.95;
+const BUCKETS_LIMIT               = 50;
+
+/**
  * Limit on size of event cache objects
  */
-$cache_bucket_size = \MB_IN_BYTES * 0.95;
-if ( defined( 'CRON_CONTROL_CACHE_BUCKET_SIZE' ) && is_numeric( \CRON_CONTROL_CACHE_BUCKET_SIZE ) ) {
-	$cache_bucket_size = absint( \CRON_CONTROL_CACHE_BUCKET_SIZE );
-	$cache_bucket_size = max( 256 * \KB_IN_BYTES, min( $cache_bucket_size, \TB_IN_BYTES ) );
+$bucket_size_limit = BUCKET_SIZE_LIMIT;
+if ( defined( 'CRON_CONTROL_CACHE_BUCKET_SIZE_LIMIT' ) && is_numeric( \CRON_CONTROL_CACHE_BUCKET_SIZE_LIMIT ) ) {
+	$bucket_size_limit = absint( \CRON_CONTROL_CACHE_BUCKET_SIZE_LIMIT );
 }
-define( __NAMESPACE__ . '\CACHE_BUCKET_SIZE', $cache_bucket_size );
-unset( $cache_bucket_size );
+
+$bucket_size_default = BUCKET_SIZE_DEFAULT;
+if ( defined( 'CRON_CONTROL_CACHE_BUCKET_SIZE' ) && is_numeric( \CRON_CONTROL_CACHE_BUCKET_SIZE ) ) {
+	$bucket_size_default = absint( \CRON_CONTROL_CACHE_BUCKET_SIZE );
+	$bucket_size_default = max( 256 * \KB_IN_BYTES, min( $bucket_size_default, $bucket_size_limit ) );
+}
+define( __NAMESPACE__ . '\CACHE_BUCKET_SIZE', $bucket_size_default );
+unset( $bucket_size_default );
 
 /**
  * Limit how many buckets can be created, to avoid cache exhaustion
  */
-$max_cache_buckets = 5;
-if ( defined( 'CRON_CONTROL_MAX_CACHE_BUCKETS' ) && is_numeric( \CRON_CONTROL_MAX_CACHE_BUCKETS ) ) {
-	$max_cache_buckets = absint( \CRON_CONTROL_MAX_CACHE_BUCKETS );
-	$max_cache_buckets = max( 1, min( $max_cache_buckets, 250 ) );
+$buckets_limit = BUCKETS_LIMIT;
+if ( defined( 'CRON_CONTROL_CACHE_BUCKETS_LIMIT' ) && is_numeric( \CRON_CONTROL_CACHE_BUCKETS_LIMIT ) ) {
+	$buckets_limit = absint( \CRON_CONTROL_CACHE_BUCKETS_LIMIT );
 }
-define( __NAMESPACE__ . '\MAX_CACHE_BUCKETS', $max_cache_buckets );
-unset( $max_cache_buckets );
+
+$buckets_default = BUCKETS_DEFAULT;
+if ( defined( 'CRON_CONTROL_MAX_CACHE_BUCKETS' ) && is_numeric( \CRON_CONTROL_MAX_CACHE_BUCKETS ) ) {
+	$buckets_default = absint( \CRON_CONTROL_MAX_CACHE_BUCKETS );
+	$buckets_default = max( 1, min( $buckets_default, $buckets_limit ) );
+}
+define( __NAMESPACE__ . '\MAX_CACHE_BUCKETS', $buckets_default );
+unset( $buckets_default );
 
 /**
  * Consistent time format across plugin
